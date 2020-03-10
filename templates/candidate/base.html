@@ -39,18 +39,19 @@
     {% else %}
 
       <div class="container">
-        <div class="jumbotron">
+        <div style="background-color:#b0e0e6" class="jumbotron">
 
-          <h1>Please Log In</h1>
+          <h4>Please Log In</h4>
 
           <form action={% url 'Candidate:user_login' %} method="post">
             {% csrf_token %}
             <label for="username">Username</label>
             <input type="text" name="username" placeholder="Username">
+            <br>
             <label for="password">Password</label>
             <input type="password" name="password" placeholder="Password">
-
-            <input type="submit" name="" value="Login">
+            <br>
+            <input type="submit" class="btn  btn-danger" name="" value="Login">
           </form>
 
         </div>
