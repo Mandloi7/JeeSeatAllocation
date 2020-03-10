@@ -1,0 +1,69 @@
+{% extends 'Candidate/base.html' %}
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+{% endblock %}
+
+{% block body_block %}
+<div class="container">
+<div class="jumbotron">
+<form method="post" action="{% url 'Candidate:choicefilling' %}">
+  {% csrf_token %}
+ {% for x in branchrem %}
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" value="{{x.college.name}}-{{x.name}}" id="{{x.college.name}}-{{x.name}}" name="choice">
+  <label class="form-check-label" for="{{x.college.name}}-{{x.name}}" >
+    {{x.college.name}}-{{x.name}}
+  </label>
+</div>
+
+
+    
+  {% endfor %}
+   <script type="text/javascript">
+     //Near checkboxes
+    $('.form-check-input').on('change', function() {
+        $('.form-check-input').not(this).prop('checked', false);  
+    });
+  </script>
+
+<button type="submit" class="btn btn-primary" name="ADD">ADD</button>
+</form>
+</div>
+</div>
+
+
+<div class="container">
+<div class="jumbotron">
+<form method="post" action="{% url 'Candidate:choicefilling' %}">
+  {% csrf_token %}
+ {% for x in branchprefdone %}
+<div class="form-check">
+  <input class="form-check-input1" type="checkbox" value="{{x.college.name}}-{{x.name}}" id="{{x.college.name}}-{{x.name}}" name="Rchoice">
+  <label class="form-check-label1" for="{{x.college.name}}-{{x.name}}" >
+    {{x.college.name}}-{{x.name}}
+  </label>
+</div>
+
+    
+  {% endfor %}
+   <script type="text/javascript">
+     //Near checkboxes
+    $('.form-check-input1').on('change', function() {
+        $('.form-check-input1').not(this).prop('checked', false);  
+    });
+  </script>
+
+<button type="submit" class="btn btn-primary" name="REMOVE">REMOVE</button>
+</form>
+</div>
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}
+</html>

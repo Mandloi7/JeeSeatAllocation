@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    {% block js %}
+    {% endblock %}
+  </head>
+  <body>
+
+    {% if user.is_authenticated %}
+
+    <nav class="navbar navbar-default navbar-static-top">
+
+      <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a class="navbar-link" href="{% url 'home' %}">HOME</a></li>
+          <li><a class="navbar-link" href="{% url 'Candidate:choicefilling' %}">Choice_Filling</a></li>
+          <li><a class="navbar-link" href="{% url 'Candidate:change_password' %}">Change Password</a></li>
+          <li><a class="navbar-link" href="{% url 'logout' %}">Log Out</a></li>
+
+        </ul>
+      </div>
+
+    </nav>
+
+    <div class="container">
+
+      {% block body_block %}
+
+
+
+      {% endblock %}
+
+    </div>
+
+
+    {% else %}
+
+      <div class="container">
+        <div class="jumbotron">
+
+          <h1>Please Log In</h1>
+
+          <form action={% url 'Candidate:user_login' %} method="post">
+            {% csrf_token %}
+            <label for="username">Username</label>
+            <input type="text" name="username" placeholder="Username">
+            <label for="password">Password</label>
+            <input type="password" name="password" placeholder="Password">
+
+            <input type="submit" name="" value="Login">
+          </form>
+
+        </div>
+
+      </div>
+
+    {% endif %}
+
+
+  </body>
+</html>
