@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from django.urls import reverse
 from django.contrib import messages
+from Candidate.forms import StudentUserForm,CandidateForm
 # Create your views here.
 
 
@@ -14,6 +15,52 @@ from django.contrib import messages
 def user_logout(request):
     logout(request);
     return HttpResponseRedirect(reverse('home'))
+
+
+def home(request):
+    
+
+    if request.user.is_authenticated:
+       
+        dict1 = Candidate.objects.filter(user=request.user)
+        if len(dict1)>0:
+            return render(request,'Candidate/base.html',{})
+        else:
+            return HttpResponse("unable to log in")
+    else:
+        #not logged in
+        return render(request, 'Candidate/base.html')
+
+def register(request):
+    registered = False
+    if request.method == "POST":
+        print("hahaha")
+        user_form = StudentUserForm(data=request.POST)
+        info_form = CandidateForm(data=request.POST)
+        if user_form.is_valid() and info_form.is_valid():
+            print("lalala")
+            user = user_form.save();
+            user.set_password(user.password)
+            user.save()
+            profile = info_form.save(commit=False)
+            profile.user = user;
+            profile.save()
+            registered = True
+            if user:
+                print("papapa")
+                if user.is_active:
+                    ("oaoaoa")
+                    login(request, user)
+                    return HttpResponseRedirect(reverse('home'))
+
+                else:
+                    return HttpResponse('ACCOUNT NOT ACTIVE')
+            else:
+                return HttpResponse("invalid login details supplied")
+    else:
+        user_form=StudentUserForm()
+        info_form=CandidateForm()
+    return render(request, 'Candidate/register_page.html', {'user_form': user_form, 'info_form': info_form, 'registered': registered, 'registerFlag': 0})
 
 
 def user_login(request):
@@ -164,16 +211,4 @@ def ChoiceFilling(request):
     return render(request, 'Candidate/choicefilling.html',
                   {'branches': branches, 'branchprefdone': branchprefdone, 'branchrem': branchrem})
 
-def home(request):
-    
 
-    if request.user.is_authenticated:
-       
-        dict1 = Candidate.objects.filter(user=request.user)
-        if len(dict1)>0:
-            return render(request,'Candidate/base.html',{})
-        else:
-        	return HttpResponse("unable to log in")
-    else:
-        #not logged in
-        return render(request, 'Candidate/base.html')
