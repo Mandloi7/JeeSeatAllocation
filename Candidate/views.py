@@ -4,7 +4,9 @@ from .models import *
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import update_session_auth_hash
 from django.urls import reverse
+from django.contrib import messages
 # Create your views here.
 
 
@@ -50,7 +52,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
-            return HttpResponseRedirect(reverse('studentIndex'))
+            return HttpResponseRedirect(reverse('home'))
         else:
             messages.error(request, 'Please correct the error below.')
     else:
