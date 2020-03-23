@@ -7,7 +7,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from django.urls import reverse
 from django.contrib import messages
-from Candidate.forms import StudentUserForm,CandidateForm
+from Candidate.forms import StudentUserForm, CandidateForm
+
+
 # Create your views here.
 
 
@@ -18,18 +20,28 @@ def user_logout(request):
 
 
 def home(request):
-    
-
     if request.user.is_authenticated:
-       
         dict1 = Candidate.objects.filter(user=request.user)
-        if len(dict1)>0:
-            return render(request,'Candidate/base.html',{})
+        if len(dict1) > 0:
+            return render(request, 'Candidate/base.html')
         else:
-            return HttpResponse("unable to log in")
+            return render(request, 'Candidate/base.html')
     else:
-        #not logged in
+        # not logged in
         return render(request, 'Candidate/base.html')
+
+
+def admin_home(request):
+    if request.user.is_authenticated:
+        dict1 = Candidate.objects.filter(user=request.user)
+        if len(dict1) > 0:
+            return render(request, 'Candidate/admin.html')
+        else:
+            return render(request, 'Candidate/admin.html')
+    else:
+        # not logged in
+        return render(request, 'Candidate/base.html')
+
 
 def register(request):
     registered = False
@@ -49,22 +61,22 @@ def register(request):
             if user:
                 print("papapa")
                 if user.is_active:
-                    ("oaoaoa")
+                    print("oaoaoa")
                     login(request, user)
                     return HttpResponseRedirect(reverse('home'))
 
                 else:
-                    return HttpResponse('ACCOUNT NOT ACTIVE')
+                    return HttpResponseRedirect(reverse('home'))
             else:
-                return HttpResponse("invalid login details supplied")
+                return HttpResponseRedirect(reverse('home'))
     else:
-        user_form=StudentUserForm()
-        info_form=CandidateForm()
-    return render(request, 'Candidate/register_page.html', {'user_form': user_form, 'info_form': info_form, 'registered': registered, 'registerFlag': 0})
+        user_form = StudentUserForm()
+        info_form = CandidateForm()
+    return render(request, 'Candidate/register_page.html',
+                  {'user_form': user_form, 'info_form': info_form, 'registered': registered, 'registerFlag': 0})
 
 
 def user_login(request):
-   
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -75,13 +87,17 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
 
-                #to check the type of user to log in
+                # to check the type of user to log in
 
                 dict1 = Candidate.objects.filter(user=request.user)
-                if len(dict1)>0:
-                    return HttpResponseRedirect(reverse('home'))
+
+                if len(dict1) > 0:
+                    if dict1[0].is_admin == 1:
+                        return HttpResponseRedirect(reverse('admin_home'))
+                    else:
+                        return HttpResponseRedirect(reverse('home'))
                 else:
-                	return HttpResponse("unable to log in")
+                    return HttpResponseRedirect(reverse('home'))
 
             else:
                 return HttpResponse('ACCOUNT NOT ACTIVE')
@@ -91,6 +107,7 @@ def user_login(request):
             return HttpResponse("invalid login details supplied")
     else:
         return render(request, 'Candidate/base.html', {})
+
 
 def change_password(request):
     if request.method == 'POST':
@@ -109,38 +126,35 @@ def change_password(request):
     })
 
 
-
-
-
-
-
 def ChoiceFilling(request):
     if request.POST:
         print(request.POST)
-        if ("ADD" in request.POST and "choice" in request.POST):
+        if "ADD" in request.POST and "choice" in request.POST:
             arr = []
             branchprefdone = []
             branches = Branch.objects.all()
             cand = Candidate.objects.get(user=request.user)
             pref = cand.preferences
-            if(pref is None):
+            ask = ""
+            if pref is ask:
                 cand.preferences = str(request.POST['choice'])
             else:
-                cand.preferences=str(cand.preferences)+","+str(request.POST['choice'])
+                cand.preferences = str(cand.preferences) + "," + str(request.POST['choice'])
             cand.save()
-            pref=cand.preferences
-            if(pref):
+            pref = cand.preferences
+            if pref:
                 arr = pref.split(",")
                 for x in arr:
-                    temp=x.split('-')
-                    if(len(temp) == 2):
-                        branchprefdone.append(Branch.objects.get(name=temp[1],college=College.objects.get(name=temp[0])))
+                    temp = x.split('-')
+                    if len(temp) == 2:
+                        branchprefdone.append(
+                            Branch.objects.get(name=temp[1], college=College.objects.get(name=temp[0])))
             #     branchprefdone = Branch.objects.filter(name__in=brname,college_name__in=coll)
             branchrem = []
             for x in branches:
                 if x not in branchprefdone:
                     branchrem.append(x)
-        elif ("REMOVE" in request.POST and "Rchoice" in request.POST):
+        elif "REMOVE" in request.POST and "Rchoice" in request.POST:
             print(len(request.POST['Rchoice']))
             print("-----------=-=-----------=-=-=--==-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-==-==-=-=-=-=--=-=-=-")
             arr = []
@@ -148,29 +162,32 @@ def ChoiceFilling(request):
             branches = Branch.objects.all()
             cand = Candidate.objects.get(user=request.user)
             pref = cand.preferences
-            temppref=""
+            temppref = ""
             if pref is not None:
                 arr = pref.split(",")
                 for x in arr:
-                    if(x in request.POST['Rchoice']):
+                    if x in request.POST['Rchoice']:
                         pass
+                    elif temppref == "":
+                        temppref = x
                     else:
-                        temppref=temppref+x
-            cand.preferences=temppref
+                        print(x)
+                        temppref = temppref + ',' + x
+            cand.preferences = temppref
             cand.save()
-            pref=temppref
-            if(pref):
+            pref = temppref
+            if pref:
                 arr1 = pref.split(",")
                 for x in arr1:
-                    temp=x.split('-')
-                    if(len(temp) == 2):
-                        branchprefdone.append(Branch.objects.get(name=temp[1],college=College.objects.get(name=temp[0])))
+                    temp = x.split('-')
+                    if len(temp) == 2:
+                        branchprefdone.append(
+                            Branch.objects.get(name=temp[1], college=College.objects.get(name=temp[0])))
             #     branchprefdone = Branch.objects.filter(name__in=brname,college_name__in=coll)
             branchrem = []
             for x in branches:
                 if x not in branchprefdone:
                     branchrem.append(x)
-
 
         else:
             arr = []
@@ -178,12 +195,13 @@ def ChoiceFilling(request):
             branches = Branch.objects.all()
             cand = Candidate.objects.get(user=request.user)
             pref = cand.preferences
-            if(pref):
+            if pref:
                 arr = pref.split(",")
                 for x in arr:
-                    temp=x.split('-')
-                    if(len(temp) == 2):
-                        branchprefdone.append(Branch.objects.get(name=temp[1],college=College.objects.get(name=temp[0])))
+                    temp = x.split('-')
+                    if len(temp) == 2:
+                        branchprefdone.append(
+                            Branch.objects.get(name=temp[1], college=College.objects.get(name=temp[0])))
             branchrem = []
             for x in branches:
                 if x not in branchprefdone:
@@ -194,15 +212,15 @@ def ChoiceFilling(request):
         branches = Branch.objects.all()
         cand = Candidate.objects.get(user=request.user)
         pref = cand.preferences
-        if(pref):
+        if pref:
             arr = pref.split(",")
             coll = []
             brname = []
             temp = []
             for x in arr:
-                temp=x.split('-')
-                if(len(temp) == 2):
-                    branchprefdone.append(Branch.objects.get(name=temp[1],college=College.objects.get(name=temp[0])))
+                temp = x.split('-')
+                if len(temp) == 2:
+                    branchprefdone.append(Branch.objects.get(name=temp[1], college=College.objects.get(name=temp[0])))
         branchrem = []
         for x in branches:
             if x not in branchprefdone:
@@ -212,3 +230,251 @@ def ChoiceFilling(request):
                   {'branches': branches, 'branchprefdone': branchprefdone, 'branchrem': branchrem})
 
 
+def brnull(request):
+    br = Branch.objects.all()
+    for i in br:
+        i.gen_capacity_filled = 0
+        i.gen_pwd_capacity_filled = 0
+        i.obc_ncl_capacity_filled = 0
+        i.obc_ncl_pwd_capacity_filled = 0
+        i.sc_capacity_filled = 0
+        i.sc_pwd_capacity_filled = 0
+        i.st_capacity_filled = 0
+        i.st_pwd_capacity_filled = 0
+        i.save()
+
+    return HttpResponseRedirect(reverse('admin_home'))
+
+
+def assign(request):
+    cands = Candidate.objects.filter(freeze=0, removed=0, is_admin=0)
+    for cand in cands:
+        if cand.category == "GEN":
+            pref = cand.preferences
+            if pref is not None:
+                pref_arr = pref.split(",")
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+        elif cand.category == "OBC":
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.obc_ncl_capacity_filled += 1
+                        asd.save()
+                        break
+        elif cand.category == "SC":
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.sc_capacity_filled < asd.sc_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.sc_capacity_filled += 1
+                        asd.save()
+                        break
+        elif cand.category == "ST":
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.st_capacity_filled < asd.st_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.st_capacity_filled += 1
+                        asd.save()
+                        break
+        elif cand.category == "GENPWD":
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+        elif cand.category == "OBCPWD":
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.obc_ncl_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.obc_ncl_pwd_capacity_filled < asd.obc_ncl_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.obc_ncl_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+        elif cand.category == "SCPWD":
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.sc_capacity_filled < asd.sc_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.sc_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.sc_pwd_capacity_filled < asd.sc_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.sc_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+        else:
+            pref = cand.preferences
+            print(pref)
+            if pref is not None:
+                pref_arr = pref.split(",")
+                print(pref_arr)
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    brn = br_arr[1]
+                    print(br_arr[1])
+                    clg = College.objects.get(name=br_arr[0])
+                    clg_id = clg.id
+                    asd = Branch.objects.get(name=brn, college=clg_id)
+                    if asd.gen_capacity_filled < asd.gen_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.gen_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.st_capacity_filled < asd.st_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.st_capacity_filled += 1
+                        asd.save()
+                        break
+                    elif asd.st_pwd_capacity_filled < asd.st_pwd_capacity:
+                        cand.final_seat = asd
+                        cand.save()
+                        asd.st_pwd_capacity_filled += 1
+                        asd.save()
+                        break
+
+    return HttpResponseRedirect(reverse('admin_home'))
