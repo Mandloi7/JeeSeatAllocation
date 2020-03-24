@@ -16,8 +16,6 @@
       <div class="container">
         <ul class="nav navbar-nav">
           <li><a class="navbar-link" href="{% url 'home' %}">HOME</a></li>
-          <li><a class="navbar-link" href="{% url 'Candidate:choicefilling' %}">Choice_Filling</a></li>
-          <li><a class="navbar-link" href="{% url 'Candidate:change_password' %}">Change Password</a></li>
           <li><a class="navbar-link" href="{% url 'logout' %}">Log Out</a></li>
 
         </ul>
@@ -28,41 +26,14 @@
     <div class="container">
       <h4 class="text-center text-danger">HELLO {{user.username}}</h4>
 
-      <h3>
-        Your Final Seat as of now is {{seat}}
-      </h3>
-
+      <h4>
+          Your seat has been removed.
+      </h4>
 
           <br>
       {% block body_block %}
 
-<br>
-      <br>
-      <h4>
-        To freeze your seat, submit the following form.
-      </h4>
-      <div class="container">
-        <div style="background-color:#b0e0e6" class="jumbotron">
-<form action="{% url 'tofreeze' %}" method="post">
-            {% csrf_token %}
-            {{ freeze.as_p }}
-            <input type="submit" class="btn btn-primary" name="" value="FREEZE">
-      </form>
-</div>
-</div>
 
-        <h4>
-        To remove your seat, submit the following form.
-      </h4>
-      <div class="container">
-        <div style="background-color:#b0e0e6" class="jumbotron">
-<form action="{% url 'toremove' %}" method="post">
-            {% csrf_token %}
-            {{ freeze.as_p }}
-            <input type="submit" class="btn btn-primary" name="" value="REMOVE">
-      </form>
-</div>
-</div>
 
       {% endblock %}
 

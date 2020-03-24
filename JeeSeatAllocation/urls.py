@@ -10,4 +10,6 @@ urlpatterns = [
     path('assign/', views.assign, name='assign'),
     path('tozero/', views.brnull, name='tozero'),
     path('assign-admin/', views.admin_home, name='admin_home'),
+    path('tofreeze/', views.to_freeze, name='tofreeze'),
+    path('toremove/', views.to_remove, name='toremove'),
 ]

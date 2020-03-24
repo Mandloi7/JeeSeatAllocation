@@ -74,6 +74,7 @@ class Candidate(models.Model):
     removed = models.IntegerField(default=0)
     is_admin = models.IntegerField(default=0)
     final_seat = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, blank=True)
+    quota_for_seat = models.CharField(max_length=100, choices=CHOICES, blank=True)
 
     def setpreferences(self, x):
         self.preferences = ",".join(x)

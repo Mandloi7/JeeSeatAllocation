@@ -35,35 +35,9 @@
 
           <br>
       {% block body_block %}
-
-<br>
-      <br>
-      <h4>
-        To freeze your seat, submit the following form.
-      </h4>
-      <div class="container">
-        <div style="background-color:#b0e0e6" class="jumbotron">
-<form action="{% url 'tofreeze' %}" method="post">
-            {% csrf_token %}
-            {{ freeze.as_p }}
-            <input type="submit" class="btn btn-primary" name="" value="FREEZE">
-      </form>
-</div>
-</div>
-
-        <h4>
-        To remove your seat, submit the following form.
-      </h4>
-      <div class="container">
-        <div style="background-color:#b0e0e6" class="jumbotron">
-<form action="{% url 'toremove' %}" method="post">
-            {% csrf_token %}
-            {{ freeze.as_p }}
-            <input type="submit" class="btn btn-primary" name="" value="REMOVE">
-      </form>
-</div>
-</div>
-
+            <h3>
+                YOUR SEAT HAS BEEN FREEZED
+            </h3>
       {% endblock %}
 
     </div>

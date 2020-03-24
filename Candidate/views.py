@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from django.urls import reverse
 from django.contrib import messages
-from Candidate.forms import StudentUserForm, CandidateForm
+from Candidate.forms import StudentUserForm, CandidateForm, FreezeForm
 
 
 # Create your views here.
@@ -15,17 +15,22 @@ from Candidate.forms import StudentUserForm, CandidateForm
 
 @login_required
 def user_logout(request):
-    logout(request);
+    logout(request)
     return HttpResponseRedirect(reverse('home'))
 
 
 def home(request):
     if request.user.is_authenticated:
         dict1 = Candidate.objects.filter(user=request.user)
+
         if len(dict1) > 0:
-            return render(request, 'Candidate/base.html')
+            freeze_form = FreezeForm()
+            if dict1[0].freeze == 1:
+                return render(request, 'Candidate/freezed.html', {'seat': dict1[0].final_seat})
+            else:
+                return render(request, 'Candidate/base.html', {'seat': dict1[0].final_seat, 'freeze': freeze_form})
         else:
-            return render(request, 'Candidate/base.html')
+            return render(request, 'Candidate/removed.html')
     else:
         # not logged in
         return render(request, 'Candidate/base.html')
@@ -51,11 +56,11 @@ def register(request):
         info_form = CandidateForm(data=request.POST)
         if user_form.is_valid() and info_form.is_valid():
             print("lalala")
-            user = user_form.save();
+            user = user_form.save()
             user.set_password(user.password)
             user.save()
             profile = info_form.save(commit=False)
-            profile.user = user;
+            profile.user = user
             profile.save()
             registered = True
             if user:
@@ -243,7 +248,55 @@ def brnull(request):
         i.st_pwd_capacity_filled = 0
         i.save()
 
+    cands = Candidate.objects.filter(freeze=1, removed=0)
+    for cand in cands:
+        cat = cand.quota_for_seat
+        if cat == "GEN":
+            cand.final_seat.gen_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "OBC":
+            cand.final_seat.obc_ncl_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "SC":
+            cand.final_seat.sc_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "ST":
+            cand.final_seat.st_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "GENPWD":
+            cand.final_seat.gen_pwd_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "OBCPWD":
+            cand.final_seat.obc_ncl_pwd_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "SCPWD":
+            cand.final_seat.sc_pwd_capacity_filled += 1
+            cand.final_seat.save()
+        if cat == "STPWD":
+            cand.final_seat.st_pwd_capacity_filled += 1
+            cand.final_seat.save()
+
     return HttpResponseRedirect(reverse('admin_home'))
+
+
+def to_freeze(request):
+    if request.POST:
+        rollnumber = request.POST['rollnumber']
+        cand = Candidate.objects.get(rollnumber=rollnumber)
+        cand.freeze = 1
+        cand.save()
+        return HttpResponseRedirect(reverse('home'))
+
+
+def to_remove(request):
+    if request.POST:
+        rollnumber = request.POST['rollnumber']
+        cand = Candidate.objects.get(rollnumber=rollnumber)
+        cand.removed = 1
+        id = cand.id
+        logout(request)
+        Candidate.objects.filter(id=id).delete()
+        return HttpResponseRedirect(reverse('home'))
 
 
 def assign(request):
@@ -261,6 +314,7 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
@@ -280,12 +334,14 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "OBC"
                         cand.save()
                         asd.obc_ncl_capacity_filled += 1
                         asd.save()
@@ -305,12 +361,14 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.sc_capacity_filled < asd.sc_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "SC"
                         cand.save()
                         asd.sc_capacity_filled += 1
                         asd.save()
@@ -330,12 +388,14 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.st_capacity_filled < asd.st_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "ST"
                         cand.save()
                         asd.st_capacity_filled += 1
                         asd.save()
@@ -355,12 +415,14 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GENPWD"
                         cand.save()
                         asd.gen_pwd_capacity_filled += 1
                         asd.save()
@@ -380,24 +442,28 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GENPWD"
                         cand.save()
                         asd.gen_pwd_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "OBC"
                         cand.save()
                         asd.obc_ncl_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.obc_ncl_pwd_capacity_filled < asd.obc_ncl_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "OBCPWD"
                         cand.save()
                         asd.obc_ncl_pwd_capacity_filled += 1
                         asd.save()
@@ -417,24 +483,28 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GENPWD"
                         cand.save()
                         asd.gen_pwd_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.sc_capacity_filled < asd.sc_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "SC"
                         cand.save()
                         asd.sc_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.sc_pwd_capacity_filled < asd.sc_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "SCPWD"
                         cand.save()
                         asd.sc_pwd_capacity_filled += 1
                         asd.save()
@@ -454,24 +524,28 @@ def assign(request):
                     asd = Branch.objects.get(name=brn, college=clg_id)
                     if asd.gen_capacity_filled < asd.gen_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GEN"
                         cand.save()
                         asd.gen_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "GENPWD"
                         cand.save()
                         asd.gen_pwd_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.st_capacity_filled < asd.st_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "ST"
                         cand.save()
                         asd.st_capacity_filled += 1
                         asd.save()
                         break
                     elif asd.st_pwd_capacity_filled < asd.st_pwd_capacity:
                         cand.final_seat = asd
+                        cand.quota_for_seat = "STPWD"
                         cand.save()
                         asd.st_pwd_capacity_filled += 1
                         asd.save()

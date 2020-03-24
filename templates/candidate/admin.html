@@ -26,11 +26,41 @@
     <div class="container">
       <h4 class="text-center text-danger">HELLO {{user.username}}</h4>
       <br>
-
+      <h3>
+        1st Round:
+      </h3>
       <div>
-          <a href="{% url 'assign' %}"> to assign seats 1st time</a>
-          <br>
-          <a href="{% url 'tozero' %}"> to start again </a>
+          <h4>
+            1.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            2. <a href="{% url 'assign' %}"> to assign seats 1st time</a>
+          </h4>
+        </div>
+
+      <h3>
+        2nd Round:
+      </h3>
+      <div>
+          <h4>
+            1. First remove some users and freeze for some other users
+            <br>
+            2.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            3. <a href="{% url 'assign' %}"> to assign seats 2nd time</a>
+          </h4>
+        </div>
+
+      <h3>
+        3rd Round:
+      </h3>
+      <div>
+          <h4>
+            1. First remove some users and freeze for some other users
+            <br>
+            2.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            3. <a href="{% url 'assign' %}"> to assign seats 3rd time</a>
+          </h4>
         </div>
 
       {% block body_block %}
