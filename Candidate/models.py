@@ -71,6 +71,7 @@ class Candidate(models.Model):
     phone = PhoneField(null=False, blank=True)
     preferences = models.CharField(max_length=1000, default="", null=True, blank=True)
     freeze = models.IntegerField(default=0)
+    locked = models.IntegerField(default=0)
     removed = models.IntegerField(default=0)
     is_admin = models.IntegerField(default=0)
     final_seat = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, blank=True)
