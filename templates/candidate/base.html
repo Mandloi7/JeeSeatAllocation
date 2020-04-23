@@ -50,9 +50,33 @@
       </form>
 </div>
 </div>
+<h4>
+        To Float your seat, submit the following form.
+      </h4>
+      <div class="container">
+        <div style="background-color:#b0e0e6" class="jumbotron">
+<form action="{% url 'tofreeze' %}" method="post">
+            {% csrf_token %}
+            {{ freeze.as_p }}
+            <input type="submit" class="btn btn-primary" name="" value="FLOAT">
+      </form>
+</div>
+</div>
+<h4>
+        To Slide your seat, submit the following form.
+      </h4>
+      <div class="container">
+        <div style="background-color:#b0e0e6" class="jumbotron">
+<form action="{% url 'toslide' %}" method="post">
+            {% csrf_token %}
+            {{ freeze.as_p }}
+            <input type="submit" class="btn btn-primary" name="" value="SLIDE">
+      </form>
+</div>
+</div>
 
         <h4>
-        To remove your seat, submit the following form.
+        To Quit the counselling, submit the following form.
       </h4>
       <div class="container">
         <div style="background-color:#b0e0e6" class="jumbotron">

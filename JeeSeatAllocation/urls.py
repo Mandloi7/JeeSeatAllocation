@@ -11,5 +11,6 @@ urlpatterns = [
     path('tozero/', views.brnull, name='tozero'),
     path('assign-admin/', views.admin_home, name='admin_home'),
     path('tofreeze/', views.to_freeze, name='tofreeze'),
+    path('toslide/', views.to_slide, name='toslide'),
     path('toremove/', views.to_remove, name='toremove'),
 ]

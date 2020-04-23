@@ -24,11 +24,14 @@ def home(request):
         dict1 = Candidate.objects.filter(user=request.user)
 
         if len(dict1) > 0:
-            freeze_form = FreezeForm()
-            if dict1[0].freeze == 1:
-                return render(request, 'Candidate/freezed.html', {'seat': dict1[0].final_seat})
+            if dict1[0].is_admin == 1 :
+                return render(request,'Candidate/admin.html')
             else:
-                return render(request, 'Candidate/base.html', {'seat': dict1[0].final_seat, 'freeze': freeze_form})
+                freeze_form = FreezeForm()
+                if dict1[0].freeze == 1:
+                    return render(request, 'Candidate/freezed.html', {'seat': dict1[0].final_seat})
+                else:
+                    return render(request, 'Candidate/base.html', {'seat': dict1[0].final_seat, 'freeze': freeze_form})
         else:
             return render(request, 'Candidate/removed.html')
     else:
@@ -287,6 +290,13 @@ def to_freeze(request):
         cand.save()
         return HttpResponseRedirect(reverse('home'))
 
+def to_slide(request):
+    if request.POST:
+        rollnumber = request.POST['rollnumber']
+        cand = Candidate.objects.get(rollnumber=rollnumber)
+        cand.freeze = 2
+        cand.save()
+        return HttpResponseRedirect(reverse('home'))
 
 def to_remove(request):
     if request.POST:
