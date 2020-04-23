@@ -139,6 +139,7 @@ def ChoiceFilling(request):
         print(request.POST)
         cand = Candidate.objects.get(user=request.user)
         if(cand.locked == 0):
+            lock = 0
             if "ADD" in request.POST and "choice" in request.POST:
                 arr = []
                 branchprefdone = []
@@ -216,6 +217,7 @@ def ChoiceFilling(request):
                     if x not in branchprefdone:
                         branchrem.append(x)
         else:
+            lock = 1;
             arr = []
             branchprefdone = []
             branches = Branch.objects.all()
@@ -239,6 +241,7 @@ def ChoiceFilling(request):
         branchprefdone = []
         branches = Branch.objects.all()
         cand = Candidate.objects.get(user=request.user)
+        lock = cand.locked
         pref = cand.preferences
         if pref:
             arr = pref.split(",")
@@ -255,7 +258,7 @@ def ChoiceFilling(request):
                 branchrem.append(x)
 
     return render(request, 'Candidate/choicefilling.html',
-                  {'branches': branches, 'branchprefdone': branchprefdone, 'branchrem': branchrem})
+                  {'branches': branches, 'branchprefdone': branchprefdone, 'branchrem': branchrem, 'lock':lock})
 
 
 def brnull(request):

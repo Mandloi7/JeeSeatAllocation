@@ -94,20 +94,29 @@
 
 
     {% else %}
+      <br>
+      <br>
+      
+      <div class="container mt-5">
+        <h2 class="text-center text-danger">JEE SEAT ALLOCATION</h2>
+        <br>
+      <br>
+        <div style="background-color:#b0e0e6" class="jumbotron text-center">
 
-      <div class="container">
-        <div style="background-color:#b0e0e6" class="jumbotron">
-
-          <h4>Please Log In</h4>
+          
 
           <form action={% url 'Candidate:user_login' %} method="post">
             {% csrf_token %}
             <label for="username">Username</label>
             <input type="text" name="username" placeholder="Username">
             <br>
+            <br>
+            
             <label for="password">Password</label>
             <input type="password" name="password" placeholder="Password">
             <br>
+            <br>
+            
             <input type="submit" class="btn  btn-danger" name="" value="Login">
           </form>
 
@@ -116,7 +125,7 @@
       </div>
 
       <div class="container">
-        <div style="background-color:#b0e0e6" class="jumbotron">
+        <div style="background-color:#b0e0e6" class="jumbotron text-center">
 
           <h4 class="text-danger">Haven't Registered, Register!</h4>
 

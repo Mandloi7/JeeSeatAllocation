@@ -67,7 +67,7 @@ class Candidate(models.Model):
     gender = models.CharField(max_length=100, choices=CHOICES1, null=False)
     rank = models.IntegerField(null=False, unique=True)
     birthdate = models.DateField(null=True, blank=True)
-    email = models.EmailField(null=False, default="a@gmail.com")
+    email = models.EmailField(null=False)
     phone = PhoneField(null=False, blank=True)
     preferences = models.CharField(max_length=1000, default="", null=True, blank=True)
     freeze = models.IntegerField(default=0)

@@ -31,7 +31,7 @@
 </div>
 </div> -->
 
-
+  {% if lock == 0 %}
     <div class="container">
       <div style="background-color:#b0e0e6" class="jumbotron">
       	<h5 class="text-center text-danger">ADD CHOICES ONE BY ONE</h5>
@@ -75,33 +75,42 @@
 
       </div>
     </div>
+{% endif %}
 
     <div class="container">
       <div style="background-color:#b0e0e6" class="jumbotron">
+        {% if lock == 0 %}
       	<h5 class="text-center text-danger">REMOVE CHOICES ONE BY ONE</h5>
         <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for College" title="Type in College">
         <input type="text" id="myInput1" onkeyup="myFunction1()" placeholder="Search for Branch" title="Type in Branch">
+        {% else %}
+        <h5 class="text-center text-danger">YOUR LOCKED CHOICES</h5>
+        <input type="text" id="myInput1" onkeyup="myFunction2()" placeholder="Search for College" title="Type in College">
+        <input type="text" id="myInput" onkeyup="myFunction5()" placeholder="Search for Branch" title="Type in Branch">
+        {% endif %}
+        
         <br><br>
-
+         {% if lock == 0 %}
         <form action="{% url 'Candidate:choicefilling' %}" method="post">
         {% csrf_token %}
-
+        {% endif %}
         <table class="table table-hover" style="width:100%" id="myTable">
         <tr>
+          {% if lock == 0 %}
           <th>Select</th>
+          {% endif %}
           <th>PREFERENCE NUMBER</th>
           <th>COLLEGE</th>
           <th>BRANCH</th>
         </tr>
-
         {% for x in branchprefdone %}
-
         <tr>
+          {% if lock == 0 %}
           <td><input class="form-check-input1" type="checkbox" value="{{ x.college.name }}-{{ x.name }}" id="{{ x.college.name }}-{{ x.name }}" name="Rchoice"  ></td>
+          {% endif %}
           <td>{{ forloop.counter }}</td>
           <td>{{ x.college.name }}</td>
           <td>{{ x.name }}</td>
-         
         </tr>
 
         {% endfor %}
@@ -113,19 +122,39 @@
 		</script>
 
       </table>
-
+{% if lock == 0 %}
       <br>
 
           <button type="submit" name="REMOVE" class="btn btn-danger">REMOVE</button>
 
     </form>
-
+{% endif %}
       </div>
     </div>
 
 
  <script>
         function myFunction()
+        {
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toLowerCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[2];
+          if (td)
+          {
+            txtValue = td.textContent.toLowerCase() || td.innerText.toLowerCase();
+            if (txtValue.indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+function myFunction5()
         {
           var input, filter, table, tr, td, i, txtValue;
           input = document.getElementById("myInput");
@@ -167,6 +196,27 @@
           }
         }
       }
+       function myFunction2()
+        {
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput1");
+          filter = input.value.toLowerCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td)
+          {
+            txtValue = td.textContent.toLowerCase() || td.innerText.toLowerCase();
+            if (txtValue.indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+
 
 
        function myFunction3()
