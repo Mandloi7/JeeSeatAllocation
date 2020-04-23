@@ -294,7 +294,23 @@ def to_slide(request):
     if request.POST:
         rollnumber = request.POST['rollnumber']
         cand = Candidate.objects.get(rollnumber=rollnumber)
-        cand.freeze = 2
+        fseat = str(cand.final_seat)
+        pref = str(cand.preferences)
+        if fseat is not None:
+            arrrr = fseat.split('-')
+            colseat=arrrr[0]
+            if pref is not None:
+                pref_arr = pref.split(",")
+                pref = ""
+                for br in pref_arr:
+                    br_arr = br.split('-')
+                    if(colseat == br_arr[0]):
+                        brn = br_arr[1]
+                        if pref is "":
+                            pref=colseat+"-"+brn
+                        else:
+                            pref+=","+colseat+"-"+brn
+        cand.preferences = pref
         cand.save()
         return HttpResponseRedirect(reverse('home'))
 
@@ -312,253 +328,257 @@ def to_remove(request):
 def assign(request):
     cands = Candidate.objects.filter(freeze=0, removed=0, is_admin=0)
     for cand in cands:
-        if cand.category == "GEN":
-            pref = cand.preferences
-            if pref is not None:
-                pref_arr = pref.split(",")
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-        elif cand.category == "OBC":
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "OBC"
-                        cand.save()
-                        asd.obc_ncl_capacity_filled += 1
-                        asd.save()
-                        break
-        elif cand.category == "SC":
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.sc_capacity_filled < asd.sc_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "SC"
-                        cand.save()
-                        asd.sc_capacity_filled += 1
-                        asd.save()
-                        break
-        elif cand.category == "ST":
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.st_capacity_filled < asd.st_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "ST"
-                        cand.save()
-                        asd.st_capacity_filled += 1
-                        asd.save()
-                        break
-        elif cand.category == "GENPWD":
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GENPWD"
-                        cand.save()
-                        asd.gen_pwd_capacity_filled += 1
-                        asd.save()
-                        break
-        elif cand.category == "OBCPWD":
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GENPWD"
-                        cand.save()
-                        asd.gen_pwd_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "OBC"
-                        cand.save()
-                        asd.obc_ncl_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.obc_ncl_pwd_capacity_filled < asd.obc_ncl_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "OBCPWD"
-                        cand.save()
-                        asd.obc_ncl_pwd_capacity_filled += 1
-                        asd.save()
-                        break
-        elif cand.category == "SCPWD":
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GENPWD"
-                        cand.save()
-                        asd.gen_pwd_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.sc_capacity_filled < asd.sc_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "SC"
-                        cand.save()
-                        asd.sc_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.sc_pwd_capacity_filled < asd.sc_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "SCPWD"
-                        cand.save()
-                        asd.sc_pwd_capacity_filled += 1
-                        asd.save()
-                        break
+        if(cand.freeze == 2):
+            pass
         else:
-            pref = cand.preferences
-            print(pref)
-            if pref is not None:
-                pref_arr = pref.split(",")
-                print(pref_arr)
-                for br in pref_arr:
-                    br_arr = br.split('-')
-                    brn = br_arr[1]
-                    print(br_arr[1])
-                    clg = College.objects.get(name=br_arr[0])
-                    clg_id = clg.id
-                    asd = Branch.objects.get(name=brn, college=clg_id)
-                    if asd.gen_capacity_filled < asd.gen_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GEN"
-                        cand.save()
-                        asd.gen_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "GENPWD"
-                        cand.save()
-                        asd.gen_pwd_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.st_capacity_filled < asd.st_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "ST"
-                        cand.save()
-                        asd.st_capacity_filled += 1
-                        asd.save()
-                        break
-                    elif asd.st_pwd_capacity_filled < asd.st_pwd_capacity:
-                        cand.final_seat = asd
-                        cand.quota_for_seat = "STPWD"
-                        cand.save()
-                        asd.st_pwd_capacity_filled += 1
-                        asd.save()
-                        break
+
+            if cand.category == "GEN":
+                pref = cand.preferences
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+            elif cand.category == "OBC":
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "OBC"
+                            cand.save()
+                            asd.obc_ncl_capacity_filled += 1
+                            asd.save()
+                            break
+            elif cand.category == "SC":
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.sc_capacity_filled < asd.sc_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "SC"
+                            cand.save()
+                            asd.sc_capacity_filled += 1
+                            asd.save()
+                            break
+            elif cand.category == "ST":
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.st_capacity_filled < asd.st_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "ST"
+                            cand.save()
+                            asd.st_capacity_filled += 1
+                            asd.save()
+                            break
+            elif cand.category == "GENPWD":
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GENPWD"
+                            cand.save()
+                            asd.gen_pwd_capacity_filled += 1
+                            asd.save()
+                            break
+            elif cand.category == "OBCPWD":
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GENPWD"
+                            cand.save()
+                            asd.gen_pwd_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.obc_ncl_capacity_filled < asd.obc_ncl_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "OBC"
+                            cand.save()
+                            asd.obc_ncl_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.obc_ncl_pwd_capacity_filled < asd.obc_ncl_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "OBCPWD"
+                            cand.save()
+                            asd.obc_ncl_pwd_capacity_filled += 1
+                            asd.save()
+                            break
+            elif cand.category == "SCPWD":
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GENPWD"
+                            cand.save()
+                            asd.gen_pwd_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.sc_capacity_filled < asd.sc_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "SC"
+                            cand.save()
+                            asd.sc_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.sc_pwd_capacity_filled < asd.sc_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "SCPWD"
+                            cand.save()
+                            asd.sc_pwd_capacity_filled += 1
+                            asd.save()
+                            break
+            else:
+                pref = cand.preferences
+                print(pref)
+                if pref is not None:
+                    pref_arr = pref.split(",")
+                    print(pref_arr)
+                    for br in pref_arr:
+                        br_arr = br.split('-')
+                        brn = br_arr[1]
+                        print(br_arr[1])
+                        clg = College.objects.get(name=br_arr[0])
+                        clg_id = clg.id
+                        asd = Branch.objects.get(name=brn, college=clg_id)
+                        if asd.gen_capacity_filled < asd.gen_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GEN"
+                            cand.save()
+                            asd.gen_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.gen_pwd_capacity_filled < asd.gen_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "GENPWD"
+                            cand.save()
+                            asd.gen_pwd_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.st_capacity_filled < asd.st_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "ST"
+                            cand.save()
+                            asd.st_capacity_filled += 1
+                            asd.save()
+                            break
+                        elif asd.st_pwd_capacity_filled < asd.st_pwd_capacity:
+                            cand.final_seat = asd
+                            cand.quota_for_seat = "STPWD"
+                            cand.save()
+                            asd.st_pwd_capacity_filled += 1
+                            asd.save()
+                            break
 
     return HttpResponseRedirect(reverse('admin_home'))
