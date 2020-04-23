@@ -69,7 +69,7 @@ class Candidate(models.Model):
     birthdate = models.DateField(null=True, blank=True)
     email = models.EmailField(null=False, default="a@gmail.com")
     phone = PhoneField(null=False, blank=True)
-    preferences = models.CharField(max_length=1000, default="", null=True, blank=False)
+    preferences = models.CharField(max_length=1000, default="", null=True, blank=True)
     freeze = models.IntegerField(default=0)
     removed = models.IntegerField(default=0)
     is_admin = models.IntegerField(default=0)

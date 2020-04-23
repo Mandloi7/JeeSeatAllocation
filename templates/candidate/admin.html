@@ -26,6 +26,7 @@
     <div class="container">
       <h4 class="text-center text-danger">HELLO {{user.username}}</h4>
       <br>
+      <div class="jumbotron" style="background-color: lightgreen;" >
       <h3>
         1st Round:
       </h3>
@@ -62,7 +63,56 @@
             3. <a href="{% url 'assign' %}"> to assign seats 3rd time</a>
           </h4>
         </div>
+      <h3>
+        4th Round:
+      </h3>
+      <div>
+          <h4>
+             1. First remove some users and freeze for some other users
+             <br>
+            2.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            3. <a href="{% url 'assign' %}"> to assign seats 1st time</a>
+          </h4>
+        </div>
 
+      <h3>
+        5th Round:
+      </h3>
+      <div>
+          <h4>
+            1. First remove some users and freeze for some other users
+            <br>
+            2.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            3. <a href="{% url 'assign' %}"> to assign seats 2nd time</a>
+          </h4>
+        </div>
+
+      <h3>
+        6th Round:
+      </h3>
+      <div>
+          <h4>
+            1. First remove some users and freeze for some other users
+            <br>
+            2.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            3. <a href="{% url 'assign' %}"> to assign seats 3rd time</a>
+          </h4>
+        </div>
+        <h3>
+        7th Round:
+      </h3>
+      <div>
+          <h4>
+            1. First remove some users and freeze for some other users
+            <br>
+            2.<a href="{% url 'tozero' %}"> To initialise </a>
+            <br>
+            3. <a href="{% url 'assign' %}"> to assign seats 3rd time</a>
+          </h4>
+        </div>
       {% block body_block %}
 
 
@@ -101,7 +151,7 @@
 
           <a href={% url 'Candidate:register' %} class="text-danger"><button type=submit class="btn btn-primary">REGISTER</button></a>
         </div>
-
+</div>
       </div>
 
 
