@@ -2,7 +2,7 @@
 
 A web platform similar to https://josaa.nic.in (Official counseling platform to allocate seats to JEE candidates)
 
-##### Gale Shapley Algorithm : [Wiki](https://en.wikipedia.org/wiki/GalWikie%E2%80%93Shapley_algorithm)<br />
+##### Gale Shapley Algorithm : [Wiki](https://en.wikipedia.org/wiki/Gale%E2%80%93Shapley_algorithm)<br />
 ##### Stable Matching: [Wiki](https://en.wikipedia.org/wiki/Stable_marriage_problem)<br />
 ##### How it works:<br />
 1. Students fill their preferences and lock their choices before the deadline.<br />
